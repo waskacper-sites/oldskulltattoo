@@ -1,0 +1,328 @@
+/* ==========================================================================
+   OLD SKULL TATTOO ART GALLERY - Dedykowane Style Mrocznej Strony Pokazowej
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Główna paleta - Mroczna Elegancja & Krwista Czerwień / Złoto */
+    --accent-primary: #dc2626;
+    --accent-hover: #b91c1c;
+    --accent-light: #fca5a5;
+    --accent-glow: rgba(220, 38, 38, 0.45);
+    --accent-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+    --accent-bg-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+
+    --gold-accent: #d4af37;
+    --gold-glow: rgba(212, 175, 55, 0.35);
+
+    /* Tła i powierzchnie */
+    --bg-base: #09090b;
+    --bg-surface: #111116;
+    --bg-card: #18181f;
+    --border-color: #27272a;
+    --border-highlight: rgba(220, 38, 38, 0.3);
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: #e4e4e7;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+}
+
+/* Typografia Nagłówków - Cinzel / Gothic Luxury */
+.font-cinzel {
+    font-family: 'Cinzel', serif;
+}
+
+.font-serif-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.font-gothic-title {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    letter-spacing: 0.04em;
+}
+
+/* Gradienty akcentowe */
+.gold-gradient-text,
+.accent-gradient-text {
+    background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.crimson-gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, #fca5a5 40%, #dc2626 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-bg,
+.accent-gradient-bg {
+    background: var(--accent-bg-gradient);
+    box-shadow: 0 4px 20px var(--accent-glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.gold-gradient-bg:active {
+    transform: scale(0.97);
+}
+
+/* Szklane Panele (Dark Glassmorphism) */
+.glass-panel {
+    background: rgba(18, 18, 22, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-red {
+    background: rgba(24, 15, 18, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+/* Efekty hover dla kart i przycisków */
+.card-hover-effect {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-4px);
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 12px 30px -8px rgba(220, 38, 38, 0.2);
+}
+
+/* Kalendarz i godziny */
+.calendar-day-btn {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calendar-day-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.calendar-day-btn:active:not(:disabled) {
+    transform: scale(0.92);
+}
+
+.calendar-day-btn.selected-day {
+    background-color: var(--accent-primary) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 18px var(--accent-glow);
+    transform: scale(1.04);
+}
+
+.time-slot-btn {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.time-slot-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.time-slot-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.time-slot-btn.selected-slot {
+    background-color: var(--accent-primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 0 18px var(--accent-glow);
+    transform: scale(1.02);
+}
+
+/* Kolorystyczne oznaczenia dostępności dni w kalendarzu */
+.cal-day-free {
+    background: rgba(6, 78, 59, 0.22) !important;
+    border-color: rgba(5, 150, 105, 0.4) !important;
+    color: #a7f3d0 !important;
+}
+.cal-day-free:hover:not(:disabled) {
+    background: rgba(6, 78, 59, 0.45) !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+.cal-day-partial {
+    background: rgba(120, 53, 15, 0.28) !important;
+    border-color: rgba(217, 119, 6, 0.5) !important;
+    color: #fde68a !important;
+}
+.cal-day-partial:hover:not(:disabled) {
+    background: rgba(120, 53, 15, 0.5) !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+
+.cal-day-full {
+    background: rgba(127, 29, 29, 0.32) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    color: #fca5a5 !important;
+}
+.cal-day-full:hover:not(:disabled) {
+    background: rgba(127, 29, 29, 0.55) !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+/* Animacja przejścia kroków rezerwacji */
+@keyframes stepSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.step-slide-in {
+    animation: stepSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Płynne animacje FAQ (Accordion) */
+details summary {
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s ease;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary i {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+details[open] summary i {
+    transform: rotate(180deg);
+}
+
+details[open] .faq-content {
+    animation: faqExpand 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes faqExpand {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 350px;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #09090b;
+}
+::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #dc2626;
+}
+
+/* Animacje i prześwietlenia */
+#ambient-canvas {
+    transform: translateZ(0);
+    will-change: transform;
+    pointer-events: none;
+}
+
+/* Dynamiczne odsłanianie na scroll */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* Portfolio Lightbox */
+#portfolio-lightbox {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+}
+
+#portfolio-lightbox.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+#portfolio-lightbox:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+}
+
+#lightbox-image-container img {
+    max-height: 75vh;
+    max-width: 90vw;
+    object-fit: contain;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+}
+
+/* Modale i Bannery */
+#cookie-banner {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+/* Subtelny animowany blask wokół badge'a */
+@keyframes redPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+    50% { box-shadow: 0 0 22px rgba(220, 38, 38, 0.7); }
+}
+
+.pulse-red-glow {
+    animation: redPulse 3s infinite ease-in-out;
+}
+
+/* Optymalizacje pod urządzenia mobilne */
+@media (max-width: 640px) {
+    .calendar-day-btn {
+        font-size: 13px;
+    }
+    input, textarea, select {
+        font-size: 16px !important;
+    }
+}

@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Old Skull Tattoo Art Gallery | Tarnów - Studio Tatuażu od 2009 r.</title>
+    <meta name="theme-color" content="#09090b">
+    <meta name="title" content="Old Skull Tattoo Art Gallery | Tarnów - Rezerwacja Wizyt & Portfolio">
+    <meta name="description" content="Autorskie studio tatuażu w Tarnowie z tradycjami od 2009 roku. Rezerwuj termin online 24/7.">
+    <meta name="author" content="Old Skull Tattoo Art Gallery">
+    
+    <!-- Favicon / Logo w karcie przeglądarki -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="shortcut icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Old Skull Tattoo Art Gallery">
+    <meta property="og:title" content="Old Skull Tattoo Art Gallery | Tarnów">
+    <meta property="og:description" content="Mroczna elegancja, unikalne autorskie projekty tatuaży i wygodna rezerwacja online.">
+    <meta property="og:image" content="logo.png">
+    <meta property="og:locale" content="pl_PL">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+
+    <!-- Supabase JS & EmailJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            base: '#09090b',
+                            card: '#121216',
+                            surface: '#18181d',
+                            border: '#27272a',
+                            hover: '#22222a'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['"Cinzel"', 'serif'],
+                        gothic: ['"Cinzel Decorative"', '"Cinzel"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark-base text-gray-200 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-red-600 selection:text-white">
+
+    <!-- Canvas z subtelnymi mrocznymi promieniami w tle -->
+    <canvas id="ambient-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- BANER DEMONSTRACYJNY -->
+    <div class="bg-gradient-to-r from-red-950 via-red-900 to-black text-white py-2.5 px-4 text-center text-xs sm:text-sm font-medium border-b border-red-800/40 relative z-50 shadow-lg flex items-center justify-center gap-2 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 bg-red-600/30 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-red-300 border border-red-500/40">
+            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Wersja Demo
+        </span>
+        <span>Spersonalizowany projekt strony przygotowany dla <strong>Old Skull Tattoo Art Gallery</strong> w Tarnowie.</span>
+        <button type="button" onclick="openContactOwnerModal()" class="underline hover:text-red-300 font-bold transition cursor-pointer">Chcesz taką stronę? Skontaktuj się z nami! →</button>
+    </div>
+
+    <!-- UNIWERSALNY MODAL POWIADOMIEŃ -->
+    <div id="custom-modal-backdrop" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-all duration-300 opacity-0">
+        <div id="custom-modal-card" class="glass-panel-red bg-dark-card border border-red-900/50 p-6 sm:p-9 rounded-2xl max-w-lg w-full text-center shadow-2xl relative transform transition-all duration-300 scale-95 opacity-0">
+            <button id="custom-modal-close-btn" type="button" aria-label="Zamknij" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-dark-surface border border-dark-border hover:border-red-600 text-gray-400 hover:text-white flex items-center justify-center text-sm transition cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="custom-modal-icon-container" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg"></div>
+            <h3 id="custom-modal-title" class="font-serif-title text-2xl sm:text-3xl text-white mb-3"></h3>
+            <div id="custom-modal-body" class="text-base text-gray-300 leading-relaxed mb-6 font-normal"></div>
+            <div id="custom-modal-actions" class="flex flex-col-reverse sm:flex-row gap-3 justify-center">
+                <button id="custom-modal-cancel-btn" type="button" class="hidden w-full sm:w-auto px-6 py-3 rounded-xl border border-dark-border text-gray-300 hover:text-white text-xs sm:text-sm uppercase tracking-widest transition cursor-pointer font-medium">Anuluj</button>
+                <button id="custom-modal-confirm-btn" type="button" class="gold-gradient-bg text-white font-bold px-7 py-3 rounded-xl text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition cursor-pointer shadow-lg w-full sm:w-auto">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAWIGACJA GŁÓWNA -->
+    <nav class="sticky top-0 left-0 w-full z-40 bg-dark-base/95 backdrop-blur-md border-b border-dark-border/80">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="flex justify-between items-center h-20 sm:h-24">
+                <!-- Logo studia -->
+                <a href="#" class="flex items-center gap-3.5 group">
+                    <div class="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
+                        <img src="logo.png" alt="Old Skull Tattoo Art Gallery" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div>
+                        <span class="font-cinzel text-lg sm:text-2xl font-black tracking-wider text-white block leading-tight">OLD SKULL</span>
+                        <span class="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-red-500 font-bold block">Tattoo Art Gallery • Tarnów</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu (Większe i czytelniejsze fonty) -->
+                <div class="hidden lg:flex items-center gap-8 text-xs sm:text-sm font-bold uppercase tracking-widest text-gray-400">
+                    <a href="#about" class="hover:text-white transition">O Studiu</a>
+                    <a href="#korzysci" class="hover:text-white transition">Dlaczego Strona?</a>
+                    <a href="#portfolio" class="hover:text-white transition">Portfolio</a>
+                    <a href="#rezerwacja" class="hover:text-white transition">Rezerwacja</a>
+                    <a href="#testimonials" class="hover:text-white transition">Opinie</a>
+                    <a href="#contact" class="hover:text-white transition">Kontakt</a>
+                </div>
+
+                <!-- CTA Przycisk -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <a href="tel:697130545" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-gray-200 hover:text-white hover:bg-dark-surface border border-dark-border transition">
+                        <i class="fa-solid fa-phone text-red-500"></i> 697 130 545
+                    </a>
+                    <a href="#rezerwacja" class="gold-gradient-bg px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-wider hover:opacity-90 transition shadow-lg shadow-red-950/50 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-sm"></i>
+                        <span>Zarezerwuj</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- WIDOK GŁÓWNY STRONY -->
+    <div id="main-content-view" class="flex-grow flex flex-col justify-between relative z-10">
+
+        <!-- HERO SECTION (Wyraziste, duże nagłówki i czytelne teksty) -->
+        <header class="relative min-h-[80vh] sm:min-h-[85vh] flex items-center justify-center pt-12 sm:pt-20 pb-16 sm:pb-24 overflow-hidden border-b border-dark-border/60">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[650px] bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-6 text-center relative z-10">
+                <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-panel border border-red-600/40 text-red-400 text-xs sm:text-sm uppercase tracking-widest font-bold mb-8 pulse-red-glow">
+                    <i class="fa-solid fa-skull text-red-500 text-sm"></i>
+                    <span>Studio z tradycjami od 2009 roku • Tarnów</span>
+                </div>
+
+                <h1 class="font-gothic-title text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-black tracking-tight leading-[1.08] mb-6 sm:mb-8">
+                    OLD SKULL <br><span class="crimson-gradient-text">TATTOO ART GALLERY</span>
+                </h1>
+
+                <p class="text-gray-300 text-base sm:text-xl md:text-2xl max-w-3xl mx-auto font-normal leading-relaxed mb-10 sm:mb-12">
+                    Mroczna estetyka, autorski kunszt i mistrzowska precyzja od 2009 roku w Tarnowie. Wybierz swój styl i zarezerwuj dogodny termin online.
+                </p>
+
+                <!-- Przyciski CTA -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 sm:mb-16 w-full max-w-md mx-auto sm:max-w-none">
+                    <a href="#rezerwacja" class="w-full sm:w-auto gold-gradient-bg px-8 py-4 rounded-xl text-white font-bold text-sm sm:text-base uppercase tracking-widest shadow-xl hover:scale-105 transition flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-calendar-plus text-base"></i> Zarezerwuj Termin Online
+                    </a>
+                    <a href="#rezerwacja" class="w-full sm:w-auto glass-panel border border-red-600/40 px-8 py-4 rounded-xl text-white font-bold text-sm sm:text-base uppercase tracking-widest hover:border-red-500 hover:bg-red-950/40 transition flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-clock text-red-400 text-base"></i> Sprawdź Wolne Terminy
+                    </a>
+                </div>
+
+                <!-- Liczniki zaufania (Powiększone cyfry i opisy) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto border-t border-dark-border/80 pt-8 sm:pt-10">
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl text-center border border-dark-border">
+                        <span class="block font-serif-title text-2xl sm:text-4xl text-white font-bold mb-1">2009</span>
+                        <span class="text-xs sm:text-sm text-gray-400 uppercase tracking-wider font-semibold">Rok Założenia</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl text-center border border-dark-border">
+                        <span class="block font-serif-title text-2xl sm:text-4xl text-red-500 font-bold mb-1">4.9 ★</span>
+                        <span class="text-xs sm:text-sm text-gray-400 uppercase tracking-wider font-semibold">Google Tarnów</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl text-center border border-dark-border">
+                        <span class="block font-serif-title text-2xl sm:text-4xl text-white font-bold mb-1">100%</span>
+                        <span class="text-xs sm:text-sm text-gray-400 uppercase tracking-wider font-semibold">Autorskie Projekty</span>
+                    </div>
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl text-center border border-dark-border">
+                        <span class="block font-serif-title text-2xl sm:text-4xl text-red-500 font-bold mb-1">24/7</span>
+                        <span class="text-xs sm:text-sm text-gray-400 uppercase tracking-wider font-semibold">Rezerwacja Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SEKCJA: O STUDIU (Powiększone teksty i nagłówki) -->
+        <section id="about" class="py-16 sm:py-24 border-t border-dark-border bg-dark-surface/40">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                    <div class="reveal-on-scroll">
+                        <span class="text-red-500 font-mono text-xs sm:text-sm uppercase tracking-widest font-bold block mb-3">// O Studio Old Skull</span>
+                        <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-6 leading-tight">
+                            Sztuka Tatuażu <br><span class="crimson-gradient-text">Bez Kompromisów</span>
+                        </h2>
+                        <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-5 font-normal">
+                            Od 2009 roku w sercu Tarnowa przy ul. Goldhammera 5 tworzymy unikatową sztukę na ciele. <strong>Old Skull Tattoo Art Gallery</strong> to przestrzeń stworzona dla osób ceniących mroczny klimat, rockowy charakter i absolutną precyzję rzemiosła.
+                        </p>
+                        <p class="text-gray-400 text-base sm:text-lg leading-relaxed mb-8">
+                            Niezależnie od tego, czy planujesz pierwszy tatuaż, duży projekt realistyczny, subtelny fineline czy zakrycie starego wzoru – gwarantujemy indywidualne podejście i sterylne, bezpieczne warunki.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base font-bold text-white">
+                            <div class="flex items-center gap-3.5 glass-panel p-4 rounded-xl border border-dark-border">
+                                <i class="fa-solid fa-shield-halved text-red-500 text-lg"></i>
+                                <span>Sterylność & Bezpieczeństwo</span>
+                            </div>
+                            <div class="flex items-center gap-3.5 glass-panel p-4 rounded-xl border border-dark-border">
+                                <i class="fa-solid fa-gem text-red-500 text-lg"></i>
+                                <span>Najwyższej Klasy Pigmenty</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative reveal-on-scroll">
+                        <div class="relative rounded-2xl overflow-hidden border border-red-900/40 shadow-2xl">
+                            <img src="portfolio-4.jpg" alt="Old Skull Tattoo Tarnów - Realistyczny Wilk" class="w-full h-[360px] sm:h-[480px] object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-base via-transparent to-transparent"></div>
+                            <div class="absolute bottom-5 left-5 right-5 glass-panel p-5 rounded-xl border border-red-600/30">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-serif-title text-white text-base sm:text-lg font-bold">Goldhammera 5, Tarnów</h4>
+                                        <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Centrum miasta • Tradycja od 2009 r.</p>
+                                    </div>
+                                    <span class="w-10 h-10 rounded-full bg-red-600/20 text-red-500 flex items-center justify-center text-base">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: DLACZEGO WARTO MIEĆ PROFESJONALNĄ STRONĘ -->
+        <section id="korzysci" class="py-16 sm:py-24 border-t border-dark-border bg-dark-base">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-10">
+                <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 reveal-on-scroll">
+                    <span class="text-red-500 font-mono text-xs sm:text-sm uppercase tracking-widest font-bold block mb-3">// Wartość Dla Twojego Studia</span>
+                    <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-4">
+                        Dlaczego Warto Posiadać <br><span class="crimson-gradient-text">Własną Nowoczesną Stronę?</span>
+                    </h2>
+                    <p class="text-gray-300 text-base sm:text-xl leading-relaxed">
+                        Sam profil na Instagramie to za mało. Dedykowana strona internetowa z systemem rezerwacji to niezależność, prestiż i stały napływ klientów.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-panel p-6 sm:p-7 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-500/30 text-red-500 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <h3 class="font-serif-title text-lg sm:text-xl text-white font-bold mb-3">Zero Prowizji</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Nie oddajesz procentu od wizyt żadnym zewnętrznym portalom ani aplikacjom. 100% zysku z każdej rezerwacji zostaje w Twoim salonie.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-7 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-500/30 text-red-500 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <h3 class="font-serif-title text-lg sm:text-xl text-white font-bold mb-3">Rezerwacje 24/7</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Klienci mogą umówić wizytę późnym wieczorem lub w weekend. Nie musisz przerywać tatuowania, aby odbierać telefony czy odpisywać na wiadomości.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-7 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-500/30 text-red-500 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <h3 class="font-serif-title text-lg sm:text-xl text-white font-bold mb-3">Wizerunek Premium</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Mroczna, dopracowana strona robi piorunujące wrażenie od pierwszej sekundy i udowadnia, że Old Skull to czołówka tatuażu w regionie.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-7 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="w-14 h-14 rounded-2xl bg-red-600/10 border border-red-500/30 text-red-500 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <h3 class="font-serif-title text-lg sm:text-xl text-white font-bold mb-3">Klienci z Tarnowa</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Osoby szukające w Google „studio tatuażu Tarnów” trafiają bezpośrednio na Twoją stronę, oglądają galerię prac i od razu wysyłają zgłoszenie.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: PORTFOLIO -->
+        <section id="portfolio" class="py-16 sm:py-24 border-t border-dark-border bg-dark-surface/20">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-10">
+                <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 reveal-on-scroll">
+                    <span class="text-red-500 font-mono text-xs sm:text-sm uppercase tracking-widest font-bold block mb-3">// Galeria Prac</span>
+                    <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-4">
+                        Wybrane Dzieła <span class="crimson-gradient-text">Old Skull</span>
+                    </h2>
+                    <p class="text-gray-300 text-base sm:text-xl">
+                        Autentyczne prace wykonane w naszym studio w Tarnowie. Kliknij w zdjęcie, aby powiększyć.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="group relative rounded-2xl overflow-hidden border border-dark-border hover:border-red-600/60 transition duration-500 cursor-pointer shadow-xl bg-dark-card" onclick="openLightbox(0)">
+                        <img src="portfolio-1.png" alt="Tatuaż Kwiaty i Motyl - Old Skull Tattoo" class="w-full h-64 sm:h-80 object-cover group-hover:scale-108 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <span class="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-red-300 bg-red-950/80 border border-red-600/40 px-2.5 py-1 rounded-full inline-block mb-1.5">Kolorowy Realizm</span>
+                            <h3 class="font-serif-title text-sm sm:text-lg text-white font-bold leading-tight">Kwiaty & Motyl</h3>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-dark-border hover:border-red-600/60 transition duration-500 cursor-pointer shadow-xl bg-dark-card" onclick="openLightbox(1)">
+                        <img src="portfolio-2.jpg" alt="Tatuaż Księżyc Dotwork - Old Skull Tattoo" class="w-full h-64 sm:h-80 object-cover group-hover:scale-108 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <span class="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-red-300 bg-red-950/80 border border-red-600/40 px-2.5 py-1 rounded-full inline-block mb-1.5">Fineline & Dotwork</span>
+                            <h3 class="font-serif-title text-sm sm:text-lg text-white font-bold leading-tight">Księżyc z Twarzą</h3>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-dark-border hover:border-red-600/60 transition duration-500 cursor-pointer shadow-xl bg-dark-card" onclick="openLightbox(2)">
+                        <img src="portfolio-3.jpg" alt="Tatuaż Lilie Blackwork - Old Skull Tattoo" class="w-full h-64 sm:h-80 object-cover group-hover:scale-108 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <span class="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-red-300 bg-red-950/80 border border-red-600/40 px-2.5 py-1 rounded-full inline-block mb-1.5">Blackwork Botaniczny</span>
+                            <h3 class="font-serif-title text-sm sm:text-lg text-white font-bold leading-tight">Lilie na Ramieniu</h3>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-2xl overflow-hidden border border-dark-border hover:border-red-600/60 transition duration-500 cursor-pointer shadow-xl bg-dark-card" onclick="openLightbox(3)">
+                        <img src="portfolio-4.jpg" alt="Tatuaż Portret Wilka - Old Skull Tattoo" class="w-full h-64 sm:h-80 object-cover group-hover:scale-108 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <span class="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-red-300 bg-red-950/80 border border-red-600/40 px-2.5 py-1 rounded-full inline-block mb-1.5">Realizm Portretowy</span>
+                            <h3 class="font-serif-title text-sm sm:text-lg text-white font-bold leading-tight">Portret Wilka</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-10 sm:mt-12">
+                    <a href="https://www.instagram.com/oldskulltattoo_artgallery" target="_blank" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl border border-red-600/50 text-red-400 hover:text-white hover:bg-red-950/40 text-sm font-bold uppercase tracking-wider transition">
+                        <i class="fa-brands fa-instagram text-base"></i> Zobacz Więcej Prac na Instagramie
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: REZERWACJA ONLINE -->
+        <section id="rezerwacja" class="py-16 sm:py-24 border-t border-dark-border bg-dark-base">
+            <div class="max-w-[950px] mx-auto px-4 sm:px-6">
+                <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14 reveal-on-scroll">
+                    <span class="text-red-500 font-mono text-xs sm:text-sm uppercase tracking-widest font-bold block mb-3">// Rezerwacja Online</span>
+                    <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-4">
+                        Zarezerwuj <span class="crimson-gradient-text">Wizytę</span>
+                    </h2>
+                    <p class="text-gray-300 text-base sm:text-lg">
+                        Wybierz preferowany styl, dogodny termin i opisz swój pomysł. Skontaktujemy się, by dopiąć szczegóły projektu.
+                    </p>
+                </div>
+
+                <div class="glass-panel-red p-5 sm:p-9 rounded-3xl border border-red-900/50 shadow-2xl overflow-hidden">
+                    <!-- Pasek Kroków (Czytelniejszy i większy) -->
+                    <div class="grid grid-cols-4 gap-2 mb-8 sm:mb-10 text-center text-xs sm:text-sm font-bold border-b border-dark-border pb-4">
+                        <div id="step-tab-1" class="text-red-500 border-b-2 border-red-600 pb-2.5 font-bold cursor-pointer transition-colors" onclick="goToBookingStep(1)">1. Styl</div>
+                        <div id="step-tab-2" class="text-gray-500 pb-2.5 cursor-pointer transition-colors" onclick="goToBookingStep(2)">2. Termin</div>
+                        <div id="step-tab-3" class="text-gray-500 pb-2.5 cursor-pointer transition-colors" onclick="goToBookingStep(3)">3. Dane</div>
+                        <div id="step-tab-4" class="text-gray-500 pb-2.5 cursor-pointer transition-colors" onclick="goToBookingStep(4)">4. Finał</div>
+                    </div>
+
+                    <!-- KROK 1: WYBÓR STYLU -->
+                    <div id="booking-step-1" class="space-y-5">
+                        <h3 class="font-serif-title text-lg sm:text-2xl text-white font-bold text-center">Wybierz Styl lub Rodzaj Wizyty</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                            <div onclick="selectService('realizm')" id="service-option-realizm" class="p-4 sm:p-5 rounded-2xl border border-red-600 bg-red-950/20 cursor-pointer hover:border-red-500 transition shadow-lg">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Realizm & Portret</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Fotorealistyczne portrety, motywy zwierzęce, mroczny gotyk.</p>
+                            </div>
+                            <div onclick="selectService('blackwork')" id="service-option-blackwork" class="p-4 sm:p-5 rounded-2xl border border-dark-border bg-dark-base cursor-pointer hover:border-red-600 transition">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Blackwork & Dark Art</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Głęboka nasycona czerń, ornamenty, motywy okultystyczne.</p>
+                            </div>
+                            <div onclick="selectService('neotraditional')" id="service-option-neotraditional" class="p-4 sm:p-5 rounded-2xl border border-dark-border bg-dark-base cursor-pointer hover:border-red-600 transition">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Neotraditional / Old School</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Wyraziste kontury, głębokie cieniowanie i bogate detale.</p>
+                            </div>
+                            <div onclick="selectService('trashpolka')" id="service-option-trashpolka" class="p-4 sm:p-5 rounded-2xl border border-dark-border bg-dark-base cursor-pointer hover:border-red-600 transition">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Graphic / Trash Polka</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Ekspresyjne kompozycje łączące realizm z elementami graficznymi.</p>
+                            </div>
+                            <div onclick="selectService('coverup')" id="service-option-coverup" class="p-4 sm:p-5 rounded-2xl border border-dark-border bg-dark-base cursor-pointer hover:border-red-600 transition">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Cover-up / Odświeżenie</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Skuteczne zakrycie lub naprawa starego tatuażu nowym projektem.</p>
+                            </div>
+                            <div onclick="selectService('konsultacja')" id="service-option-konsultacja" class="p-4 sm:p-5 rounded-2xl border border-dark-border bg-dark-base cursor-pointer hover:border-red-600 transition">
+                                <span class="font-serif-title text-white font-bold text-base sm:text-lg block">Konsultacja & Projekt</span>
+                                <p class="text-xs sm:text-sm text-gray-300 mt-1.5 leading-relaxed">Darmowe spotkanie w studiu, omówienie pomysłu i wycena.</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-4">
+                            <button onclick="goToBookingStep(2)" class="w-full sm:w-auto gold-gradient-bg px-9 py-3.5 rounded-xl text-white font-bold text-sm uppercase tracking-widest hover:opacity-90 transition shadow-lg">
+                                Przejdź do Kalendarza →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KROK 2: WYBÓR TERMINU -->
+                    <div id="booking-step-2" class="space-y-5 hidden">
+                        <div class="flex justify-between items-center pb-4 border-b border-dark-border/60">
+                            <button type="button" id="cal-prev-btn" onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl bg-dark-base border border-dark-border hover:border-red-600 text-gray-200 hover:text-white flex items-center justify-center transition cursor-pointer text-base">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <span id="current-month-year" class="text-base sm:text-xl font-serif-title font-bold text-white uppercase tracking-wider"></span>
+                            <button type="button" id="cal-next-btn" onclick="changeMonth(1)" class="w-10 h-10 rounded-xl bg-dark-base border border-dark-border hover:border-red-600 text-gray-200 hover:text-white flex items-center justify-center transition cursor-pointer text-base">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-1 text-center font-mono text-xs sm:text-sm font-bold uppercase text-gray-400 py-1.5">
+                            <div>Pn</div>
+                            <div>Wt</div>
+                            <div>Śr</div>
+                            <div>Cz</div>
+                            <div>Pt</div>
+                            <div class="text-red-500/80">Sb</div>
+                            <div class="text-red-500/80">Nd</div>
+                        </div>
+
+                        <div id="calendar-days-grid" class="grid grid-cols-7 gap-1.5"></div>
+
+                        <!-- Legenda dostępności terminów -->
+                        <div class="flex items-center justify-center gap-4 sm:gap-6 py-2.5 text-xs sm:text-sm text-gray-300 border-t border-dark-border/50 mt-2 select-none">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]"></span>
+                                <span class="text-emerald-300 font-semibold">Wolny dzień</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)]"></span>
+                                <span class="text-amber-300 font-semibold">Częściowo zajęty</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]"></span>
+                                <span class="text-red-300 font-semibold">Wszystkie zajęte</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-dark-base/80 border border-dark-border/60 text-center text-xs sm:text-sm text-gray-300">
+                            <i class="fa-solid fa-clock text-red-500 mr-2"></i> Godziny sesji: <strong>Pn – Pt: 11:00 – 17:00</strong> · <span class="text-red-400 font-semibold">Weekendy nieczynne</span>
+                        </div>
+
+                        <div class="pt-2">
+                            <h4 class="text-xs sm:text-sm uppercase font-bold tracking-widest text-gray-200 mb-3">Wybierz Godzinę Rozpoczęcia:</h4>
+                            <div id="time-slots-container" class="grid grid-cols-4 gap-2.5"></div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t border-dark-border/60">
+                            <button type="button" onclick="goToBookingStep(1)" class="px-5 py-3 rounded-xl border border-dark-border text-gray-300 hover:text-white text-xs sm:text-sm uppercase tracking-widest font-bold transition">
+                                ← Wstecz
+                            </button>
+                            <button type="button" onclick="goToBookingStep(3)" class="gold-gradient-bg px-7 py-3 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition shadow-lg">
+                                Dalej do Danych →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KROK 3: DANE KLIENTA & SZCZEGÓŁY -->
+                    <div id="booking-step-3" class="space-y-5 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Miejsce na Ciele *</label>
+                                <input type="text" id="input-placement" placeholder="np. przedramię, łydka, żebra" class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Orientacyjny Rozmiar (cm)</label>
+                                <input type="text" id="input-size" placeholder="np. 15x10 cm, cały rękaw" class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Opis Twojego Pomysłu</label>
+                            <textarea id="input-description" rows="3" placeholder="Opisz motyw, kolorystykę lub dodatkowe wskazówki..." class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Zdjęcia / Wzory Inspiracji (opcjonalnie)</label>
+                            <div class="flex flex-wrap gap-3 items-center" id="upload-preview-container">
+                                <label class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-dashed border-dark-border hover:border-red-600 flex flex-col items-center justify-center cursor-pointer transition text-gray-400 hover:text-red-500 bg-dark-base">
+                                    <i class="fa-solid fa-plus text-lg mb-1"></i>
+                                    <span class="text-[10px] sm:text-xs font-semibold">Dodaj</span>
+                                    <input type="file" id="input-inspiration-files" accept="image/*" multiple class="hidden" onchange="handleInspirationUpload(event)">
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="border-dark-border/60">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Imię i Nazwisko *</label>
+                                <input type="text" id="input-client-name" placeholder="Jan Kowalski" class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition">
+                            </div>
+                            <div class="relative">
+                                <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Telefon *</label>
+                                <div class="flex items-center">
+                                    <button type="button" id="country-prefix-btn" onclick="toggleCountryDropdown(event)" class="px-3 py-3 rounded-l-xl bg-dark-surface border border-r-0 border-dark-border text-white flex items-center gap-1.5 hover:bg-dark-hover transition text-sm">
+                                        <span class="fi fi-pl text-base rounded-sm" id="selected-flag"></span>
+                                        <span id="selected-prefix" class="font-mono font-bold text-red-400 text-xs sm:text-sm">+48</span>
+                                        <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
+                                    </button>
+                                    <input type="tel" id="input-client-phone" placeholder="697 130 545" class="w-full px-4 py-3 rounded-r-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition">
+                                </div>
+                                <div id="country-dropdown-menu" class="absolute top-full left-0 mt-1 w-64 bg-dark-card border border-dark-border rounded-xl shadow-2xl p-2 z-50 hidden">
+                                    <input type="text" id="country-search-input" oninput="renderCountryOptions(this.value)" placeholder="Szukaj kraju..." class="w-full px-3 py-2 text-xs bg-dark-base border border-dark-border rounded-lg text-white mb-2 outline-none">
+                                    <div id="country-options-list" class="space-y-1 max-h-48 overflow-y-auto"></div>
+                                </div>
+                                <p id="phone-error-msg" class="text-xs text-red-400 mt-1 hidden">Podaj poprawny numer telefonu.</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm uppercase font-bold text-gray-300 tracking-wider mb-2">Adres E-mail *</label>
+                                <input type="email" id="input-client-email" placeholder="jan@example.com" class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm sm:text-base focus:border-red-600 outline-none transition">
+                                <p id="email-error-msg" class="text-xs text-red-400 mt-1 hidden">Podaj poprawny e-mail.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t border-dark-border/60">
+                            <button type="button" onclick="goToBookingStep(2)" class="px-5 py-3 rounded-xl border border-dark-border text-gray-300 hover:text-white text-xs sm:text-sm uppercase tracking-widest font-bold transition">
+                                ← Wstecz
+                            </button>
+                            <button type="button" onclick="goToBookingStep(4)" class="gold-gradient-bg px-7 py-3 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition shadow-lg">
+                                Podsumowanie →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KROK 4: PODSUMOWANIE -->
+                    <div id="booking-step-4" class="space-y-5 hidden">
+                        <h3 class="font-serif-title text-lg sm:text-2xl text-white font-bold text-center">Podsumowanie Twojego Zgłoszenia</h3>
+                        
+                        <div class="bg-dark-base p-5 sm:p-6 rounded-2xl border border-dark-border space-y-3 text-sm sm:text-base">
+                            <div class="flex justify-between border-b border-dark-border/50 pb-2.5">
+                                <span class="text-gray-400">Wybrany Styl:</span>
+                                <span id="summary-service-text" class="font-bold text-white">--</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dark-border/50 pb-2.5">
+                                <span class="text-gray-400">Termin Wizyty:</span>
+                                <span id="summary-datetime-text" class="font-bold text-red-400 font-mono">--</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dark-border/50 pb-2.5">
+                                <span class="text-gray-400">Imię i Nazwisko:</span>
+                                <span id="summary-client-name" class="font-bold text-white">--</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dark-border/50 pb-2.5">
+                                <span class="text-gray-400">Miejsce na ciele:</span>
+                                <span id="summary-placement-text" class="font-bold text-white">--</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dark-border/50 pb-2.5">
+                                <span class="text-gray-400">Kontakt:</span>
+                                <span id="summary-contact-text" class="font-bold text-white">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Załączone Inspiracje:</span>
+                                <span id="summary-images-text" class="font-bold text-white">0 plików</span>
+                            </div>
+                        </div>
+
+                        <!-- Zgoda RODO -->
+                        <div class="flex items-start gap-3 p-4 rounded-xl bg-dark-base border border-dark-border">
+                            <input type="checkbox" id="checkbox-rodo" class="mt-1 w-5 h-5 rounded text-red-600 border-dark-border focus:ring-red-600 bg-dark-card cursor-pointer">
+                            <label for="checkbox-rodo" class="text-xs sm:text-sm text-gray-300 leading-relaxed cursor-pointer">
+                                Wyrażam zgodę na przetwarzanie danych osobowych przez <strong>Old Skull Tattoo Art Gallery</strong> w celu realizacji rezerwacji zgodnie z <a href="javascript:void(0)" onclick="openPrivacyModal()" class="text-red-400 underline hover:text-red-300 font-semibold">polityką prywatności</a>.
+                            </label>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t border-dark-border/60">
+                            <button type="button" onclick="goToBookingStep(3)" class="px-5 py-3 rounded-xl border border-dark-border text-gray-300 hover:text-white text-xs sm:text-sm uppercase tracking-widest font-bold transition">
+                                ← Popraw Dane
+                            </button>
+                            <button onclick="submitFinalBooking()" id="btn-submit-booking" class="gold-gradient-bg px-8 py-3.5 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition shadow-xl shadow-red-950/80">
+                                Potwierdzam & Wysyłam Zgłoszenie
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: OPINIE (Duże, czytelne cytaty) -->
+        <section id="testimonials" class="py-16 sm:py-24 border-t border-dark-border bg-dark-surface/40">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-10">
+                <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 reveal-on-scroll">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/60 border border-red-600/40 text-red-400 text-xs sm:text-sm font-bold mb-3">
+                        <i class="fa-brands fa-google text-red-500"></i> Google Reviews (4.9 ★)
+                    </div>
+                    <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-4">
+                        Opinie Klientów o <span class="crimson-gradient-text">Old Skull</span>
+                    </h2>
+                    <p class="text-gray-300 text-base sm:text-xl">
+                        Doświadczenie, klimat i zaufanie budowane od 2009 roku w Tarnowie.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex text-amber-400 text-sm gap-1">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <span class="text-xs text-gray-500 font-mono font-bold">Google</span>
+                        </div>
+                        <p class="text-gray-200 text-base sm:text-lg leading-relaxed mb-6 italic">
+                            „Pełen profesjonalizm i niesamowity klimat w studiu. Najlepsze dziary w Tarnowie, polecam każdemu!”
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 font-bold flex items-center justify-center text-sm">
+                                KS
+                            </div>
+                            <div>
+                                <h4 class="font-serif-title text-white text-sm sm:text-base font-bold">Kacper S.</h4>
+                                <span class="text-xs text-gray-400">Klient z Tarnowa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex text-amber-400 text-sm gap-1">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <span class="text-xs text-gray-500 font-mono font-bold">Google</span>
+                        </div>
+                        <p class="text-gray-200 text-base sm:text-lg leading-relaxed mb-6 italic">
+                            „Super atmosfera, świetne podejście do klienta i czysty profesjonalizm. Old Skull Tattoo to klasa sama w sobie od lat!”
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 font-bold flex items-center justify-center text-sm">
+                                KM
+                            </div>
+                            <div>
+                                <h4 class="font-serif-title text-white text-sm sm:text-base font-bold">Karolina M.</h4>
+                                <span class="text-xs text-gray-400">Klientka z Tarnowa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-dark-border card-hover-effect reveal-on-scroll">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex text-amber-400 text-sm gap-1">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <span class="text-xs text-gray-500 font-mono font-bold">Google</span>
+                        </div>
+                        <p class="text-gray-200 text-base sm:text-lg leading-relaxed mb-6 italic">
+                            „Niesamowite portfolio, świetny artystyczny vibe i precyzja wykonania. Na pewno wrócę po kolejne projekty.”
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 font-bold flex items-center justify-center text-sm">
+                                PW
+                            </div>
+                            <div>
+                                <h4 class="font-serif-title text-white text-sm sm:text-base font-bold">Paweł W.</h4>
+                                <span class="text-xs text-gray-400">Klient z Tarnowa</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: FAQ (Czytelne, duże pytania i odpowiedzi) -->
+        <section id="faq" class="py-16 sm:py-24 border-t border-dark-border bg-dark-base">
+            <div class="max-w-[850px] mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10 sm:mb-14 reveal-on-scroll">
+                    <span class="text-red-500 font-mono text-xs sm:text-sm uppercase tracking-widest font-bold block mb-3">// Odpowiedzi</span>
+                    <h2 class="font-serif-title text-3xl sm:text-5xl lg:text-6xl text-white font-black mb-4">
+                        Często Zadawane <span class="crimson-gradient-text">Pytania</span>
+                    </h2>
+                </div>
+
+                <div class="space-y-4">
+                    <details class="glass-panel rounded-2xl border border-dark-border group p-5 sm:p-6 cursor-pointer transition-all duration-300">
+                        <summary class="flex justify-between items-center font-serif-title text-base sm:text-xl text-white font-bold select-none">
+                            <span>Jak przygotować się do sesji tatuażu?</span>
+                            <i class="fa-solid fa-chevron-down text-red-500 text-sm"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-sm sm:text-base text-gray-300 mt-4 leading-relaxed font-normal">
+                                Wyśpij się i zjedz sycący posiłek przed wizytą. Dzień wcześniej nie pij alkoholu i dbaj o odpowiednie nawodnienie organizmu. Załóż wygodne ubranie, które nie będzie uciskać tatuowanego miejsca.
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="glass-panel rounded-2xl border border-dark-border group p-5 sm:p-6 cursor-pointer transition-all duration-300">
+                        <summary class="flex justify-between items-center font-serif-title text-base sm:text-xl text-white font-bold select-none">
+                            <span>W jakich godzinach studio przyjmuje klientów?</span>
+                            <i class="fa-solid fa-chevron-down text-red-500 text-sm"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-sm sm:text-base text-gray-300 mt-4 leading-relaxed font-normal">
+                                Studio stacjonarne przy ul. Goldhammera 5 w Tarnowie jest otwarte od <strong>poniedziałku do piątku w godzinach 11:00 – 17:00</strong>. W weekendy odpoczywamy, lecz formularz rezerwacji online na stronie działa bez przerw 24/7!
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="glass-panel rounded-2xl border border-dark-border group p-5 sm:p-6 cursor-pointer transition-all duration-300">
+                        <summary class="flex justify-between items-center font-serif-title text-base sm:text-xl text-white font-bold select-none">
+                            <span>Czy wykonujecie cover-upy i poprawki starych tatuaży?</span>
+                            <i class="fa-solid fa-chevron-down text-red-500 text-sm"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-sm sm:text-base text-gray-300 mt-4 leading-relaxed font-normal">
+                                Jak najbardziej. W formularzu rezerwacji wybierz opcję „Cover-up / Odświeżenie” i załącz zdjęcie obecnego tatuażu. Dobierzemy odpowiedni motyw, który idealnie go zakryje.
+                            </p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER / STOPKA -->
+        <footer id="contact" class="bg-dark-surface border-t border-dark-border py-14 sm:py-20">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-14">
+                    <div class="space-y-5">
+                        <div class="flex items-center gap-3.5">
+                            <img src="logo.png" alt="Old Skull Tattoo" class="w-12 h-12 object-contain">
+                            <div>
+                                <span class="font-cinzel text-lg sm:text-xl font-black tracking-wider text-white block">OLD SKULL TATTOO</span>
+                                <span class="text-xs uppercase tracking-[0.2em] text-red-500 font-bold block">Art Gallery • Tarnów</span>
+                            </div>
+                        </div>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Autorskie studio tatuażu w Tarnowie z tradycjami od 2009 roku. Mroczny, bezkompromisowy klimat i najwyższa jakość wykonania.
+                        </p>
+                        <div class="space-y-3 text-sm sm:text-base text-gray-200">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-location-dot text-red-500 w-5"></i>
+                                <span>Goldhammera 5, 33-100 Tarnów, Poland</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-phone text-red-500 w-5"></i>
+                                <a href="tel:697130545" class="hover:text-red-400 font-bold transition">697 130 545</a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-envelope text-red-500 w-5"></i>
+                                <a href="mailto:info@oldskulltattoo.pl" class="hover:text-red-400 transition">info@oldskulltattoo.pl</a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-brands fa-instagram text-red-500 w-5"></i>
+                                <a href="https://www.instagram.com/oldskulltattoo_artgallery" target="_blank" class="hover:text-red-400 underline font-semibold transition">@oldskulltattoo_artgallery</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <h3 class="font-serif-title text-base sm:text-lg text-white font-bold uppercase tracking-wider">Godziny Pracy Studia</h3>
+                        <div class="space-y-3 text-sm sm:text-base text-gray-200">
+                            <div class="flex justify-between border-b border-dark-border pb-2">
+                                <span>Poniedziałek – Piątek:</span>
+                                <span class="font-bold text-white">11:00 – 17:00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Sobota – Niedziela:</span>
+                                <span class="font-bold text-red-500">ZAMKNIĘTE</span>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-dark-base border border-dark-border text-xs sm:text-sm text-gray-300">
+                            <i class="fa-solid fa-circle-info text-red-500 mr-2"></i> Rezerwacje przez formularz online działają całą dobę.
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <h3 class="font-serif-title text-base sm:text-lg text-white font-bold uppercase tracking-wider">Chcesz Taką Stronę Dla Studia?</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            To dedykowana wersja pokazowa przygotowana specjalnie dla Old Skull Tattoo. Jeśli chcesz wdrożyć ten projekt i zyskać automatyczne rezerwacje – odezwij się do nas!
+                        </p>
+                        <button type="button" onclick="openContactOwnerModal()" class="w-full gold-gradient-bg py-3.5 rounded-xl text-center text-white font-bold text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-envelope"></i> <span>Skontaktuj Się w Sprawie Strony</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-t border-dark-border mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs sm:text-sm text-gray-400 gap-4">
+                    <p>© 2009–2026 Old Skull Tattoo Art Gallery Tarnów. Wszelkie prawa zastrzeżone.</p>
+                    <div class="flex items-center gap-6">
+                        <a href="javascript:void(0)" onclick="openPrivacyModal()" class="hover:text-white transition">Polityka Prywatności</a>
+                        <a href="#admin" class="hover:text-red-400 font-mono transition flex items-center gap-1.5 font-bold">
+                            <i class="fa-solid fa-lock text-xs"></i> Panel Studia
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- PANEL ADMINA / ZARZĄDZANIE REZERWACJAMI -->
+    <div id="admin-view-container" class="relative z-10 pt-4 pb-16 max-w-[1300px] w-full mx-auto px-4 sm:px-6 hidden flex-grow">
+        <!-- Logowanie Admina -->
+        <div id="admin-login-box" class="max-w-md mx-auto glass-panel p-6 sm:p-9 rounded-2xl border border-red-900/50 shadow-2xl my-6">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-user-shield text-4xl text-red-500 mb-2"></i>
+                <h2 class="font-serif-title text-2xl text-white font-bold">Panel Studia</h2>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">Zarządzanie terminami Old Skull Tattoo</p>
+            </div>
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-gray-300 mb-1.5">Login Demo</label>
+                    <input type="email" id="admin-email" value="admin@oldskulltattoo.pl" required class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm outline-none focus:border-red-600">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase font-bold text-gray-300 mb-1.5">Hasło Demo</label>
+                    <input type="password" id="admin-password" value="admin123" required class="w-full px-4 py-3 rounded-xl bg-dark-base border border-dark-border text-white text-sm outline-none focus:border-red-600">
+                </div>
+                <p id="admin-login-error" class="text-xs sm:text-sm text-red-400 font-medium hidden text-center"></p>
+                <button type="submit" class="w-full gold-gradient-bg text-white font-bold py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-widest hover:opacity-90 transition shadow-lg">
+                    Zaloguj do Panelu
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard po zalogowaniu -->
+        <div id="admin-dashboard-content" class="hidden space-y-8 my-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-5 rounded-2xl border border-dark-border">
+                <div class="flex items-center gap-3.5">
+                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain">
+                    <div>
+                        <h2 class="font-serif-title text-xl text-white font-bold">Rezerwacje Old Skull Tattoo</h2>
+                        <p class="text-xs sm:text-sm text-gray-400">Zatwierdzaj lub usuwaj zgłoszenia wizyt</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.location.hash = ''" class="px-4 py-2 rounded-xl border border-dark-border text-gray-200 hover:text-white text-sm font-semibold transition">
+                        ← Strona Główna
+                    </button>
+                    <button onclick="logoutAdmin()" class="px-4 py-2 rounded-xl bg-red-950/60 border border-red-600/40 text-red-300 hover:text-white text-sm font-bold transition">
+                        Wyloguj
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABELA 1: OCZEKUJĄCE REZERWACJE -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm uppercase font-bold tracking-widest text-gray-200 flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-amber-400"></i> 
+                        Oczekujące Rezerwacje (<span id="admin-active-count" class="text-amber-400 font-mono font-bold">0</span>)
+                    </h3>
+                </div>
+
+                <div class="glass-panel rounded-2xl border border-dark-border overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-dark-base text-gray-400 font-mono text-xs uppercase tracking-wider border-b border-dark-border">
+                                    <th class="py-3.5 px-4">Termin</th>
+                                    <th class="py-3.5 px-4">Klient</th>
+                                    <th class="py-3.5 px-4">Kontakt</th>
+                                    <th class="py-3.5 px-4">Styl / Miejsce</th>
+                                    <th class="py-3.5 px-4">Status</th>
+                                    <th class="py-3.5 px-4 text-right">Decyzja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-active-bookings-body" class="divide-y divide-dark-border/60">
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-sm text-gray-500">Ładowanie rezerwacji...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA 2: HISTORIA REZERWACJI -->
+            <div class="pt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm uppercase font-bold tracking-widest text-gray-400 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-500"></i> 
+                        Historia Rezerwacji (<span id="admin-history-count" class="text-gray-400 font-mono font-bold">0</span>)
+                    </h3>
+                </div>
+
+                <div class="glass-panel rounded-2xl border border-dark-border overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-dark-base text-gray-500 font-mono text-xs uppercase tracking-wider border-b border-dark-border">
+                                    <th class="py-3.5 px-4">Termin</th>
+                                    <th class="py-3.5 px-4">Klient</th>
+                                    <th class="py-3.5 px-4">Kontakt</th>
+                                    <th class="py-3.5 px-4">Styl</th>
+                                    <th class="py-3.5 px-4">Status</th>
+                                    <th class="py-3.5 px-4 text-right">Data Decyzji</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-history-bookings-body" class="divide-y divide-dark-border/60">
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-sm text-gray-500">Brak historii rezerwacji.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX DLA GALERII -->
+    <div id="portfolio-lightbox" class="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4 sm:p-8 hidden" onclick="handleLightboxBackdropClick(event)">
+        <div class="flex justify-between items-center z-10 w-full">
+            <span id="lightbox-counter" class="text-xs sm:text-sm font-mono text-red-400 bg-red-950/70 border border-red-600/40 px-3 py-1.5 rounded-full font-bold">1/4</span>
+            <button onclick="closeLightbox()" class="w-10 h-10 rounded-full bg-dark-surface border border-dark-border hover:border-red-600 text-gray-300 hover:text-white flex items-center justify-center text-base transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="relative flex-1 flex items-center justify-center my-3 select-none" id="lightbox-image-container">
+            <button onclick="prevLightboxImage(event)" class="absolute left-2 sm:left-6 z-10 w-12 h-12 rounded-full bg-black/70 border border-dark-border hover:border-red-600 text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="" class="rounded-2xl border border-dark-border shadow-2xl max-h-[72vh] sm:max-h-[80vh] max-w-[92vw] object-contain">
+            <button onclick="nextLightboxImage(event)" class="absolute right-2 sm:right-6 z-10 w-12 h-12 rounded-full bg-black/70 border border-dark-border hover:border-red-600 text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-right text-lg"></i>
+            </button>
+        </div>
+        <div class="text-center z-10">
+            <h3 id="lightbox-title" class="font-serif-title text-lg sm:text-2xl text-white font-bold"></h3>
+            <p id="lightbox-subtitle" class="text-xs sm:text-sm text-red-400 tracking-widest uppercase font-semibold mt-1">OLD SKULL TATTOO</p>
+        </div>
+    </div>
+
+    <!-- BANER COOKIES -->
+    <div id="cookie-banner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-40 translate-y-full opacity-0 transition-all duration-500">
+        <div class="glass-panel p-5 rounded-2xl border border-red-900/50 shadow-2xl space-y-2.5">
+            <div class="flex items-center gap-2 text-white font-bold text-xs sm:text-sm uppercase tracking-wider">
+                <i class="fa-solid fa-cookie-bite text-red-500 text-base"></i> Polityka Cookies
+            </div>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">Ta witryna używa plików cookies w celu prawidłowego działania modułu rezerwacji terminów.</p>
+            <div class="text-right">
+                <button onclick="acceptCookies()" class="gold-gradient-bg px-5 py-2 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-wider">Rozumiem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POLITYKI PRYWATNOŚCI -->
+    <div id="privacy-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0" onclick="closePrivacyModal()"></div>
+        <div class="relative z-10 glass-panel bg-dark-card border border-dark-border p-6 sm:p-9 rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+            <h3 class="font-serif-title text-2xl text-white font-bold mb-4">Polityka Prywatności</h3>
+            <div class="text-sm sm:text-base text-gray-300 leading-relaxed space-y-4">
+                <p><strong>1. Administrator Danych:</strong> Administratorem danych osobowych jest Old Skull Tattoo Art Gallery z siedzibą przy ul. Goldhammera 5, 33-100 Tarnów.</p>
+                <p><strong>2. Cel przetwarzania:</strong> Dane podane w formularzu (imię, telefon, e-mail, preferencje) przetwarzane są wyłącznie w celu kontaktu oraz organizacji terminu sesji tatuażu.</p>
+                <p><strong>3. Prawa użytkownika:</strong> Każda osoba ma prawo wglądu do swoich danych, ich poprawiania lub żądania ich usunięcia.</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="closePrivacyModal()" class="gold-gradient-bg px-6 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm uppercase tracking-wider">Zamknij</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Główny skrypt aplikacji -->
+    <script src="script.js"></script>
+</body>
+</html>
